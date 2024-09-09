@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.supply.mapper.UserLoginMapper">
+
+
+    <insert id="register" useGeneratedKeys="true" keyProperty="id">
+        insert into user(username, firm_name, work_type, image, email, telephone, password, create_time, update_time,ID_number)
+        values (#{username}, #{firmName}, #{workType}, #{image}, #{email}, #{telephone}, #{password}, #{createTime},
+                #{updateTime},#{IDNumber})
+    </insert>
+
+
+    <select id="login" resultType="com.supply.entity.User">
+        select * from user
+        <where>
+            <if test="email != null">
+                and email = #{email}
+            </if>
+            <if test="username != null">
+                and username = #{username}
+            </if>
+        and password = #{password}
+        </where>
+    </select>
+</mapper>
