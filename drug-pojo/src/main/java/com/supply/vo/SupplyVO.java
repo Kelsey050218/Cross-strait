@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,6 @@ public class SupplyVO implements Serializable {
 
     private String address;       //供应商地址
 
-    private String[] supplyDrugs; //供应商供应药品
+    private List<String> supplyDrugs; //供应商供应药品
 
 }

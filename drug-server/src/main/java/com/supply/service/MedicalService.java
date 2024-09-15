@@ -30,7 +30,7 @@ public interface MedicalService {
 //    void input(DrugInputDTO drugInputDTO);
 
 
-    List<SupplyVO> searchSupplyInformation(String firmName, String drugName);
+    SupplyVO searchSupplyInformation(String firmName);
 
     List<DrugInformationVO> getDrugsInformation();
 }

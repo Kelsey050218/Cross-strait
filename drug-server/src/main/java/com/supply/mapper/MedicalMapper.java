@@ -21,7 +21,8 @@ import java.util.List;
 public interface MedicalMapper {
 
 
-    List<SupplyVO> searchSupplyInformation(String firmName, String drugName);
+    @Select("select id, username, password, email, telephone, firm_name, image, address from user where firm_name = #{firmName}")
+    User searchSupplyInformation(String firmName);
 
 
     @Select("select * from request where request_user_id = #{id}")
@@ -31,20 +32,25 @@ public interface MedicalMapper {
             "values (#{userId}, #{requestUserId}, #{requestContent}, #{requestTime})")
     void addRequset(Request request);
 
-    @Select("select distinct drug_name from doctor_drug where delete_time is null")
-    List<DoctorDrug> getDrugsName();
+    @Select("select drug_name,enter_time,delete_time,id,shelf_life,drug_code,produce_Time,batchNo,barCode,drugStatus from doctor_drug")
+    List<DoctorDrug> getDrugs();
+
+    @Select("select distinct drug_name from doctor_drug")
+    List<String> getDrugNames();
 
     @Select("select count(*) from doctor_drug where drug_name = #{drugName} and delete_time is null")
     int getInventoryNumber(String drugName);
 
+    //根据药品名字查关联的供应商
     @Select("select u.firm_name from supply_drug sd join user u on sd.user_id = u.user_id where sd.drug_name = #{drugName}")
     List<String> getFirmsName(String drugName);
 
-    @Update("update doctor_drug set delete_time = #{now} where id = #{id}")
+    @Update("update doctor_drug set delete_time = #{now} where drug_code = #{id}")
     void deleteDrug(Long id, LocalDateTime now);
 
-    @Select("select drug_name,DATE_FORMAT(enter_time, '%Y-%m') as enterTime,COUNT(enter_time) as enterAmount," +
-            "DATE_FORMAT(delete_time, '%Y-%m') as deleteTime,COUNT(delete_time) as deleteAmount " +
-            "from doctor_drug group by drug_name, DATE_FORMAT(enter_time, '%Y-%m'), DATE_FORMAT(delete_time, '%Y-%m')")
-    List<DrugStatisticVO> drugStatistic();
+    //根据供应商名字查相关药品
+    @Select("select sd.drug_name from supply_drug sd join user u on sd.user_id = u.user_id where sd.firm_name = #{firmName}")
+    List<String> getSupplyDrugs(String firmName);
+
+
 }

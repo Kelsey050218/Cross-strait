@@ -47,13 +47,15 @@ public class MedicalServiceImpl implements MedicalService {
      * 查询供应商信息
      *
      * @param firmName
-     * @param drugName
      * @return 供应商信息
      */
-    public List<SupplyVO> searchSupplyInformation(String firmName, String drugName) {
-        List<SupplyVO> list = medicalMapper.searchSupplyInformation(firmName, drugName);
-        log.info("查询供应商信息：{}", list);
-        return list;
+    public SupplyVO searchSupplyInformation(String firmName) {
+        User user = medicalMapper.searchSupplyInformation(firmName);
+        SupplyVO supplyVO = new SupplyVO();
+        BeanUtils.copyProperties(user, supplyVO);
+        supplyVO.setSupplyDrugs(medicalMapper.getSupplyDrugs(firmName));
+        log.info("查询供应商信息：{}", supplyVO);
+        return supplyVO;
     }
 
 
@@ -115,9 +117,36 @@ public class MedicalServiceImpl implements MedicalService {
      * @return 药品统计信息
      */
     public List<DrugStatisticVO> drugStatistic() {
-        List<DrugStatisticVO> list = medicalMapper.drugStatistic();
-        log.info("药品统计信息：{}", list);
-        return list;
+        List<DrugStatisticVO> drugStatisticList = new ArrayList<>();
+        List<DoctorDrug> drugs = medicalMapper.getDrugs();
+        List<String> drugNames = medicalMapper.getDrugNames();
+        //索引代表月份
+        int[] enter = new int[12];
+        int[] output = new int[12];
+        //遍历每个名字
+        for (String drugName : drugNames) {
+            DrugStatisticVO drugStatisticVO = new DrugStatisticVO();
+            drugStatisticVO.setDrugName(drugName);
+            //遍历每个药品
+            for (DoctorDrug doctorDrug : drugs) {
+                //如果名字相同
+                if (doctorDrug.getDrugName().equals(drugName)) {
+                    //加入入库数量
+                    int month = doctorDrug.getEnterTime().getMonthValue();
+                    enter[month - 1]++;
+                    //加入出库数量
+                    if (doctorDrug.getDeleteTime() != null) {
+                        month = doctorDrug.getDeleteTime().getMonthValue();
+                        output[month - 1]++;
+                    }
+                }
+            }
+            drugStatisticVO.setEnterInfo(enter);
+            drugStatisticVO.setDeleteInfo(output);
+            drugStatisticList.add(drugStatisticVO);
+        }
+        log.info("药品统计信息：{}", drugStatisticList);
+        return drugStatisticList;
     }
 
 
@@ -159,14 +188,14 @@ public class MedicalServiceImpl implements MedicalService {
      */
     public List<DrugInformationVO> getDrugsInformation() {
         //用名字去重复
-        List<DoctorDrug> drugs = medicalMapper.getDrugsName();
+        List<String> drugNames = medicalMapper.getDrugNames();
         List<DrugInformationVO> list = new ArrayList<>();
-        for (DoctorDrug drug : drugs) {
+        for (String drugName : drugNames) {
             DrugInformationVO drugInformationVO = new DrugInformationVO();
-            BeanUtils.copyProperties(drug, drugInformationVO);
-            int inventoryNumber = medicalMapper.getInventoryNumber(drug.getDrugName());
+            drugInformationVO.setDrugName(drugName);
+            int inventoryNumber = medicalMapper.getInventoryNumber(drugName);
             drugInformationVO.setInventoryNumber(inventoryNumber);
-            List<String> firmsName = medicalMapper.getFirmsName(drug.getDrugName());
+            List<String> firmsName = medicalMapper.getFirmsName(drugName);
             drugInformationVO.setFirmsName(firmsName);
             list.add(drugInformationVO);
         }

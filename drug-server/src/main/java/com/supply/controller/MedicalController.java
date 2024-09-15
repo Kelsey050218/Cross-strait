@@ -30,9 +30,9 @@ public class MedicalController {
 
     @GetMapping("/supply/search")
     @Operation(summary = "搜素供应商信息接口")
-    public Result<List<SupplyVO>> searchSupplyInformation(@RequestParam String firmName,@RequestParam String drugName){
-        List<SupplyVO> list = medicalService.searchSupplyInformation(firmName,drugName);
-        return Result.success(list);
+    public Result<SupplyVO> searchSupplyInformation(@RequestParam String firmName){
+        SupplyVO supplyVO = medicalService.searchSupplyInformation(firmName);
+        return Result.success(supplyVO);
     }
 
     @GetMapping("/request")

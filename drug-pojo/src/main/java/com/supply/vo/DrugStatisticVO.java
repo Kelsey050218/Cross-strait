@@ -15,17 +15,11 @@ public class DrugStatisticVO implements Serializable {
     // 药品名称
     private String drugName;
 
-    // 药品出库时间（模糊到月）
-    private String deleteTime;
+    // 药品出库信息（模糊到月）
+    private int[] deleteInfo;
 
-    // 药品出库数量
-    private int deleteAmount;
-
-    // 药品入库时间（模糊到月）
-    private String enterTime;
-
-    // 药品入库数量
-    private int enterAmount;
+    // 药品入库信息（模糊到月）
+    private int[] enterInfo;
 
 
 
