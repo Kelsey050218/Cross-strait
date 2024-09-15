@@ -8,6 +8,7 @@ import com.supply.service.LoginService;
 import com.supply.vo.UserLoginVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class LoginController {
 
     @PostMapping("/register")
     @Operation(summary = "用户注册接口")
-    public Result<Object> register(@RequestBody UserInformationDTO userInformationDTO) {
+    public Result<Object> register(@RequestBody @Valid UserInformationDTO userInformationDTO) {
         loginService.register(userInformationDTO);
         return Result.success();
     }
@@ -37,19 +38,18 @@ public class LoginController {
 
     @PutMapping("/resetPassword")
     @Operation(summary = "重置密码接口")
-    public Result<Object> resetPassword(@RequestBody UserInformationDTO userInformationDTO) {
+    public Result<Object> resetPassword(@RequestBody @Valid UserInformationDTO userInformationDTO) {
         loginService.resetPassword(userInformationDTO);
         return Result.success();
     }
 
     @PostMapping("/login")
     @Operation(summary = "用户登录接口")
-    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
+    public Result<UserLoginVO> login(@RequestBody @Valid UserLoginDTO userLoginDTO) {
         UserLoginVO userLoginVO = loginService.login(userLoginDTO);
-        if(userLoginVO != null){
+        if (userLoginVO != null) {
             return Result.success(userLoginVO);
-        }
-        else {
+        } else {
             return Result.error(MessageConstant.INFORMATION_ERROR);
         }
     }

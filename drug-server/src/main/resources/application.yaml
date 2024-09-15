@@ -20,7 +20,7 @@ spring:
     host: ${drug.mail.host}
     username: ${drug.mail.username}
     password: ${drug.mail.password}
-    port: 465
+    port: ${drug.mail.port}
     default-encoding: UTF-8
     properties:
       mail:
@@ -29,9 +29,27 @@ spring:
             enable: true
             required: true
         debug: true
+  rabbitmq:
+    host: ${drug.rabbitmq.host}
+    port: ${drug.rabbitmq.port}
+    virtual-host: ${drug.rabbitmq.virtual-host}
+    username: ${drug.rabbitmq.username}
+    password: ${drug.rabbitmq.password}
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000ms
+        multiplier: 1
+        max-attempts: 1
+    listener:
+      simple:
+        prefetch: 1
+        acknowledge-mode: auto
+        retry:
+          enabled: true
 logging:
   file:
-    name: src/main/resources/templates/logs.log
+    name: drug-server/src/main/resources/templates/logs.log
   level:
     com:
       supply:
@@ -53,7 +71,8 @@ drug:
     access-key-id: ${drug.alioss.access-key-id}
     access-key-secret: ${drug.alioss.access-key-secret}
     bucket-name: ${drug.alioss.bucket-name}
-
+  locationKey:
+    key: ${drug.locationKey.key}
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

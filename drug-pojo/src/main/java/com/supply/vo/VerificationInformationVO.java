@@ -15,15 +15,15 @@ import java.util.List;
 @Builder
 public class VerificationInformationVO implements Serializable {
 
-    private Long id;
+    private Long id; //验证id
 
-    private String username;
+    private String username; //用户名
 
-    private String firmName;
+    private String firmName; //公司名
 
-    private String applicationTime;
+    private String applicationTime; //注册时间
 
-    private List<String> images;
+    private List<String> images; //头像
 
 
 }

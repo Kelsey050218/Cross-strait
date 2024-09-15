@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.supply.mapper.MedicalMapper">
+    <select id="searchSupplyInformation" resultType="com.supply.vo.SupplyVO">
+        SELECT id, firm_name, image, address, supply_drugs
+        FROM supply
+        <where>
+        <if test="firmName != null and firmName != ''">
+             firm_name LIKE CONCAT('%', #{firmName}, '%')
+        </if>
+        <if test="drugName != null and drugName != ''">
+            AND supply_drugs LIKE CONCAT('%', #{drugName}, '%')
+        </if>
+        </where>
+    </select>
+</mapper>

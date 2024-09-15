@@ -95,14 +95,14 @@ public class AdminServiceImpl implements AdminService {
             //对用户的申请信息做修改
             adminMapper.checkSuccessfully(id, BaseContext.getCurrentId(), LocalDateTime.now());
             //给用户发邮件进行提醒
-            emailUtil.Mail(email, "你在药品供应链系统的账户信息审核已通过，即刻可使用全部功能，具体信息请登录账户查看" + "\n" + "审核人编号：" + BaseContext.getCurrentId());
+            emailUtil.normalMail(email, "你在药品供应链系统的账户信息审核已通过，即刻可使用全部功能，具体信息请登录账户查看" + "\n" + "审核人编号：" + BaseContext.getCurrentId());
         } else {
             //将用户表中的账户状态改为审核失败
             userLoginMapper.changeStatusToCheckFailed(userId);
             //对用户的申请信息做修改
             adminMapper.checkUnsuccessfully(id, BaseContext.getCurrentId());
             //给用户发邮件进行提醒
-            emailUtil.Mail(email, "你在药品供应链系统的账户信息审核未通过，请检查后重新上传" + "\n" + "审核人编号：" + BaseContext.getCurrentId());
+            emailUtil.normalMail(email, "你在药品供应链系统的账户信息审核未通过，请检查后重新上传" + "\n" + "审核人编号：" + BaseContext.getCurrentId());
         }
     }
 
@@ -152,7 +152,7 @@ public class AdminServiceImpl implements AdminService {
             //将信息改为已处理
             adminMapper.dealReport(id);
             //向举报人发邮件告知举报不成功
-            emailUtil.Mail(reportUserEmail, """
+            emailUtil.normalMail(reportUserEmail, """
                     你好，
                     经过我们的核实，发现你的举报对象暂时不存在违规行为，因而举报不成立。
                     我们将持续关注，若发现其有违反规定的行为，将采取封号措施，感谢你对供应系统做出的贡献。""");
@@ -162,12 +162,12 @@ public class AdminServiceImpl implements AdminService {
             //将被举报人的账户封禁
             userLoginMapper.blockAccount(userId);
             //向举报人发送邮件告知举报成功
-            emailUtil.Mail(reportUserEmail, """
+            emailUtil.normalMail(reportUserEmail, """
                     你好，
                     经过我们的核实，发现你的举报对象确实存在违规行为，因而举报成立。
                     我们已对其采取封号措施，感谢你对供应系统做出的贡献。""");
             //再向被举报人发送邮件
-            emailUtil.Mail(userEmail, """
+            emailUtil.normalMail(userEmail, """
                     你好，
                     你已被举报。经过我们的核实，发现你的账号确实存在违规行为。
                     我们已对你的账号进行封号处理，如有异议请联系管理人员。""");

@@ -1,5 +1,7 @@
 package com.supply.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.supply.constant.FormattingConstant;
 import com.supply.constant.JwtClaimsConstant;
 import com.supply.constant.MessageConstant;
 import com.supply.dto.UserInformationDTO;
@@ -17,11 +19,20 @@ import com.supply.entity.User;
 import com.supply.vo.UserLoginVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +54,9 @@ public class LoginServiceImpl implements LoginService {
     private final JwtProperties jwtProperties;
 
     private final RedisTemplate<String, String> redisTemplate;
+
+    @Value("${drug.locationKey.key}")
+    private String key;
 
     /**
      * 用户预注册
@@ -138,6 +152,25 @@ public class LoginServiceImpl implements LoginService {
                 claims.put(JwtClaimsConstant.ID, userLoginVO.getId());
                 String jwt = JwtUtil.createJWT(jwtProperties.getSecretKey(), jwtProperties.getTtl(), claims);
                 userLoginVO.setToken(jwt);
+                //给用户发送邮件进行提醒
+                //先获取用户当前IP
+                CloseableHttpClient aDefault = HttpClients.createDefault();
+                HttpGet httpGet = new HttpGet("https://restapi.amap.com/v3/ip?key=" + key);
+                String location;
+                try {
+                    CloseableHttpResponse execute = aDefault.execute(httpGet);
+                    HttpEntity entity = execute.getEntity();
+                    String IP = EntityUtils.toString(entity);
+                    JSONObject jsonObject = JSONObject.parseObject(IP);
+                    location = jsonObject.getString("province") + jsonObject.getString("city");
+                    log.info("当前用户登录地址：{}", location);
+                    execute.close();
+                    aDefault.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //再发送邮件进行提醒
+                emailUtil.promptEmail(location, LocalDateTime.now().format(FormattingConstant.LOCAL_DATE_TIME_FORMATTER), u.getEmail());
                 return userLoginVO;
             } else if (u != null && u.getAccountStatus() == 2) {
                 throw new AccountStatusException(MessageConstant.ACCOUNT_LOCKED);
@@ -152,6 +185,7 @@ public class LoginServiceImpl implements LoginService {
             log.info("可能存在SQL注入风险：{}", userLoginDTO.getPassword());
             throw new SQLPasswordException(MessageConstant.DANGEROUS_PASSWORD);
         }
+
     }
 
     //以下两个方法用于检查SQL注入风险

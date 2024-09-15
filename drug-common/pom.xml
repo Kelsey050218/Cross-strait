@@ -6,7 +6,6 @@
         <groupId>com.supply</groupId>
         <artifactId>drug-supply-system</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>drug-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>

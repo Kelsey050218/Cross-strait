@@ -21,6 +21,8 @@ public class UserInformationVO implements Serializable {
 
     private String image; //用户头像
 
-    private String firmName; //公司名称
+    private String firmName; //用户公司名
+
+    private String telephone; //用户电话
 
 }
